@@ -1,8 +1,8 @@
-
 import express from "express";
 import {} from 'dotenv/config';
 const app = express();
 import connectDB from "./db/index.js";
+import mongoose from "mongoose";
 
 
 connectDB()
