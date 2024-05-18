@@ -4,10 +4,10 @@ import { User } from "../models/user.models.js"
 import { uploadOnCouldinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 
-const generateAccessAndRefreshToken = async (user_id) => {
+const generateAccessAndRefreshToken = async (userId) => {
 
     try {
-        const user = await User.findById(user_id)
+        const user = await User.findById(userId)
         const accessToken = user.generateAccressToken()
         const refreshToken = user.generateRefreshToken()
 

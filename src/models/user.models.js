@@ -59,7 +59,7 @@ userSchema.methods.isPasswrodCorrect = async function (password) {
 
 
 userSchema.methods.generateAccressToken = function () {
-    jwt.sign({
+    return jwt.sign({
         _id: this._id,
         username: this.username,
         fullname: this.fullname,
@@ -73,7 +73,7 @@ userSchema.methods.generateAccressToken = function () {
 }
 
 userSchema.methods.generateRefreshToken = function () {
-    jwt.sign({
+    return jwt.sign({
         _id: this._id
     },
         process.env.REFRESH_TOKEN_SECRET,
