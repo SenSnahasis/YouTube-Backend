@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         unique: true,
         trim: true,
     },
-    fullName: {
+    fullname: {
         type: String,
         required: true,
         trim: true
@@ -62,7 +62,7 @@ userSchema.methods.generateAccressToken = function () {
     jwt.sign({
         _id: this._id,
         username: this.username,
-        fullName: this.fullName,
+        fullname: this.fullname,
         email: this.email
     },
         process.env.ACCESS_TOKEN_SECRET,
