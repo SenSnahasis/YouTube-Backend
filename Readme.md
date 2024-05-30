@@ -8,7 +8,7 @@ Model link which help you to understand the structure
 
 
 ## Users
-Table Name: users
+Table Name: users 
 
 Description: Stores user-related information and manages user authentication.
 
