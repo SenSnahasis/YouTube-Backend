@@ -120,7 +120,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User does not exist")
     }
 
-    const isPasswordValid = await user.isPasswrodCorrect(password)
+    const isPasswordValid = await user.isPasswordCorrect(password)
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid credentials")
     }
@@ -155,8 +155,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: ""
             }
         },
         {
@@ -234,7 +234,7 @@ const changePassword = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findById(req.user?._id)
-    const checkPassword = await user.isPasswrodCorrect(currentPassword)
+    const checkPassword = await user.isPasswordCorrect(currentPassword)
     if (!checkPassword) {
         throw new ApiError(400, "Invalid current password")
     }
