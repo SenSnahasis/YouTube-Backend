@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js"
-import { uploadOnCouldinary } from "../utils/cloudinary.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 
@@ -28,7 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // validation - check username and email is non empty field
     // check user is already register: username, email
     // check for images and check for avatar
-    // upload to clouinary and check avatar
+    // upload to cloudinary and check avatar
     // create user object - create entry in db
     // remove password and refresh token from response
     // check for user creation
@@ -64,8 +64,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     // upload to clouinary and check avatar
-    const avatar = await uploadOnCouldinary(avatarLocalPath)
-    const coverImage = await uploadOnCouldinary(coverImageLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required")
     }
@@ -298,7 +298,7 @@ const updateUserAvater = asyncHandler(async (req, res) => {
     if(!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
-    const avatar = await uploadOnCouldinary(avatarLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
     if(!avatar.url) {
         throw new ApiError(400, "Error while uploading on avatar")
     }
@@ -328,7 +328,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "cover image is missing")
     }
 
-    const coverImage = await uploadOnCouldinary(coverImageLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
     if(!coverImage.url) {
         throw new ApiError(400, "Error while cover image on updated")
     }
