@@ -97,7 +97,7 @@ const updateVideo = asyncHandler(async (req, res) => {
             throw new ApiError(500, "Failed to upload thumbnail to Cloudinary")
         }
 
-        await deleteFromCloudinary(video.thumbnail.public_id)
+        await deleteFromCloudinary(video.thumbnail)
 
         video.thumbnail = thumbnail.url
     }
@@ -145,9 +145,42 @@ const deleteVideo = asyncHandler(async (req, res) => {
     )
 })
 
+const togglePublishStatus = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    if(!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid videoId")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if(!video) {
+         throw new ApiError(404, "Video not found")
+    }
+
+    if(video?.owner.toString() !== req.user?._id.toString()) {
+        throw new ApiError(403, "You are not authorized to change the publish status of this video")
+    }
+
+    video.isPublished = !video.isPublished
+    await video.save()
+
+    const message = video.isPublished
+        ? "Video published successfully"
+        : "Video unpublished successfully";
+
+    return res.status(200)
+    .json(
+        new ApiResponse(
+            200, video, message
+        )
+    )
+})
+
 
 export {
     publishAVideo,
     updateVideo,
-    deleteVideo
+    deleteVideo,
+    togglePublishStatus
 }
