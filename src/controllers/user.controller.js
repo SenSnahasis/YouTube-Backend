@@ -1,7 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiError } from "../utils/ApiError.js"
 import { User } from "../models/user.models.js"
-import { uploadOnCouldinary } from "../utils/cloudinary.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import jwt from "jsonwebtoken"
 
@@ -28,7 +28,7 @@ const registerUser = asyncHandler(async (req, res) => {
     // validation - check username and email is non empty field
     // check user is already register: username, email
     // check for images and check for avatar
-    // upload to clouinary and check avatar
+    // upload to cloudinary and check avatar
     // create user object - create entry in db
     // remove password and refresh token from response
     // check for user creation
@@ -64,8 +64,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     // upload to clouinary and check avatar
-    const avatar = await uploadOnCouldinary(avatarLocalPath)
-    const coverImage = await uploadOnCouldinary(coverImageLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required")
     }
@@ -120,7 +120,7 @@ const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(404, "User does not exist")
     }
 
-    const isPasswordValid = await user.isPasswrodCorrect(password)
+    const isPasswordValid = await user.isPasswordCorrect(password)
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid credentials")
     }
@@ -155,8 +155,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
-            $set: {
-                refreshToken: undefined
+            $unset: {
+                refreshToken: ""
             }
         },
         {
@@ -234,7 +234,7 @@ const changePassword = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findById(req.user?._id)
-    const checkPassword = await user.isPasswrodCorrect(currentPassword)
+    const checkPassword = await user.isPasswordCorrect(currentPassword)
     if (!checkPassword) {
         throw new ApiError(400, "Invalid current password")
     }
@@ -298,7 +298,7 @@ const updateUserAvater = asyncHandler(async (req, res) => {
     if(!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
-    const avatar = await uploadOnCouldinary(avatarLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath)
     if(!avatar.url) {
         throw new ApiError(400, "Error while uploading on avatar")
     }
@@ -328,7 +328,7 @@ const updateCoverImage = asyncHandler(async (req, res) => {
         throw new ApiError(400, "cover image is missing")
     }
 
-    const coverImage = await uploadOnCouldinary(coverImageLocalPath)
+    const coverImage = await uploadOnCloudinary(coverImageLocalPath)
     if(!coverImage.url) {
         throw new ApiError(400, "Error while cover image on updated")
     }
