@@ -14,7 +14,7 @@ router.route("/video").post(upload.fields([
         name: "thumbnail",
         maxCount: 1
     }
-]),verifyJwt, publishAVideo)
+]), verifyJwt, publishAVideo)
 
 router.route("/update/:videoId").patch(upload.single("thumbnail"), verifyJwt, updateVideo)
 router.route("/delete/:videoId").post(verifyJwt, deleteVideo)
