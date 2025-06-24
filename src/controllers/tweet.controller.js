@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 import { Tweet } from "../models/tweet.models.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
-import { isValidObjectId } from "mongoose"
+import mongoose, { isValidObjectId } from "mongoose"
 
 
 const createTweet = asyncHandler(async (req, res) => {
@@ -89,9 +89,75 @@ const deleteTweet = asyncHandler(async (req, res) => {
         )
 })
 
+const getUserTweets = asyncHandler(async (req, res) => {
+
+    const { userId } = req.params
+
+    if (!isValidObjectId(userId)) {
+        throw new ApiError(400, "Invalid user ID")
+    }
+
+    if (!req?.user || !req.user?._id) {
+        throw new ApiError(401, "Unauthorized: Please login")
+    }
+
+    const userTweets = await Tweet.aggregate([
+        {
+            $match: {
+                owner: new mongoose.Types.ObjectId(userId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "ownerDetails"
+            }
+        },
+        {
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "tweet",
+                as: "likedTweet"
+            }
+        },
+        {
+            $addFields: {
+                likesCount: {
+                    $size: "$likedTweet"
+                },
+                isLikedByCurrentUser: {
+                    $cond: {
+                        if: { $in: [req.user._id, "$likedTweet.likeBy"] },
+                        then: true,
+                        else: false
+                    }
+                }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                content: 1,
+                owner: {
+                    username: "$ownerDetails.username",
+                    avatar: "$ownerDetails.avatar"
+                },
+                likesCount: 1,
+                isLikedByCurrentUser: 1
+            }
+        }
+    ])
+
+    return res.status(200)
+        .json(new ApiResponse(200, userTweets, "User tweets fetch successfully"))
+})
 
 export {
     createTweet,
     updateTweet,
-    deleteTweet
+    deleteTweet,
+    getUserTweets
 }
